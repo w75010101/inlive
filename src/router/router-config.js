@@ -1,7 +1,7 @@
-import header from '@/components/common/header'
+import home from '@/components/page/home'
 
 const routerConfig = [
-    {path:"/",name:"header",component:header},
+    {path:"/",name:"home",component:home},
   ]
 ;
 
