@@ -1,6 +1,6 @@
-# omaiga
+# inLive
 
-> A Vue.js project
+> practice project, produced by Vue.js
 
 ## Build Setup
 
