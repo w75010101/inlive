@@ -1,8 +1,10 @@
-import home from '@/components/page/home'
+import newsContent from '@/components/page/newsContent'
 
 const routerConfig = [
-    {path:"/",name:"home",component:home},
-  ]
+  {path:"/",redirect:"/newsContent"},
+  {path:"/newsContent",name:"home",component:newsContent},
+
+]
 ;
 
 export default routerConfig;

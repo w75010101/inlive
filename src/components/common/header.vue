@@ -3,37 +3,47 @@
     <div class="top">
       <div class="box">
         <div class="photo">
-          <i class="el-icon-circle-plus-outline"></i>
-          <p>现场</p>
+          <img src="../../assets/img/photo.png">
+          <p>随手拍</p>
         </div>
         <div class="nowTitle">
           <p>在现场InLive</p>
         </div>
         <router-link tag="div" to='./' class="liveCenter">
-          <i class="el-icon-loading"></i>
+          <img src="../../assets/img/live.png">
           <p>直播</p>
         </router-link>
       </div>
     </div>
     <div class="bottom">
       <swiper :options="swiperOption" class="swiper-box">
-        <swiper-slide v-for="(item,index) in arr" :key="index" class="swiper-item">
-          <router-link to="./" tag="p">{{item}}</router-link>
+        <swiper-slide v-for="(item,index) in channelsInfoArr" :key="index" class="swiper-item">
+          <p @click="toActive($event)">{{item}}</p>
         </swiper-slide>
       </swiper>
       <div class="add">
-        <i class="el-icon-plus"></i>
+        <img src="../../assets/img/+.png" class="el-icon-plus" @click="addAndRemoveChannel($event)">
       </div>
     </div>
+    <div class="newsChannelsList">
+      <transition
+        enter-active-class="animated fadeInDown"
+        leave-active-class="animated fadeOutUp"
+      >
+        <div class="layout" v-if="showNewsChannelsBl">
+          <ul class="clearfix">
+            <li v-for="(item,index) in channelsInfoArr" :key="index">{{item}} ×</li>
+          </ul>
+        </div>
+      </transition>
+
+    </div>
   </div>
-
-
 </template>
 
 <script>
   import axios from "axios"
 export default {
-
   name: 'header',
   data () {
     return {
@@ -42,11 +52,61 @@ export default {
         slidesPerView:6,
         paginationClickable: true,
       },
-      arr :  ["头条","新闻","财经","体育","娱乐","军事","教育","科技","NBA","股票","星座","女性","健康","育儿"]
+      channelsInfoArr : ['头条',
+            '新闻',
+            '财经',
+            '体育',
+            '娱乐',
+            '军事',
+            '教育',
+            '科技',
+            'NBA',
+            '股票',
+            '星座',
+            '女性',
+            '健康',
+            '育儿' ] ,
+      showNewsChannelsBl:false,
+    }
+  },
+  methods:{
+    addAndRemoveChannel(e){
+      if(this.showNewsChannelsBl){
+        e.target.style.transform = 'rotate(180deg)';
+        this.showNewsChannelsBl = false;
+      }else {
+        e.target.style.transform = 'rotate(-225deg)';
+        this.showNewsChannelsBl = true;
+      }
+    },
+    getChannelsInfoArr(){
+      axios.get("newsChannels").then((data)=>{
+        if(data.data.ok !== 1) throw new Error("网络可能有问题。");
+        else {
+          this.channelsInfoArr = data.data.msg ;
+          this.$store.dispatch('channelList', data.data.msg)
+        }
+      }).catch((err)=>{
+        this.catchError(err.message)
+      })
+    },
+    catchError(msg){
+      this.$toast(msg)
+    },
+    toActive(e){
+      let arr = document.querySelectorAll(".swiper-box p");
+      for(let i=0;i<arr.length;i++){
+        arr[i].className = ""
+      }
+      e.target.className = "active";
+      this.changeState(e.target.innerHTML)
+    },
+    changeState(v){
+      this.$store.dispatch('commitNowChannel',v)
     }
   },
   mounted(){
-
+//    this.getChannelsInfoArr();
   },
   computed: {
     swiper() {
@@ -57,7 +117,9 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+  $backgroundColorBase : #409EFF;
+  $fontSize : 1.4rem;
   @keyframes okinaru {
     0% {transform: scale(1,1)}
     10% {transform: scale(1.2,1.2)}
@@ -65,29 +127,124 @@ export default {
   }
   @keyframes jumpAndRotate {
     0% {transform: scale(1,1)}
-    10% {transform: scale(1.4,1.4)}
-    20% {transform: scale(1,1)}
-    30% {transform: scale(1.4,1.4)}
-    40% {transform: scale(1,1)}
-    50% {transform: scale(1.4,1.4)}
-    60% {transform: scale(1,1)}
-    70% {transform: scale(1.4,1.4)}
-    80% {transform: scale(1,1)}
-    90% {transform: scale(1.4,1.4)}
+    25% {transform: scale(1.4,1.4)}
+    50% {transform: scale(1,1)}
+    75% {transform: scale(1.4,1.4)}
     100% {transform: scale(1,1)}
   }
-  .el-icon-circle-plus-outline {animation: okinaru 4s linear infinite}
-  .header {width: 100%; height: 6.8rem;}
-  .top {width: 100%; height: 4.4rem; background: #409EFF; }
-  .top .box {width: 86%; height: 4.4rem; margin: 0 auto;display: flex;justify-content: space-between; align-items: center;}
-  .photo,.nowTitle,.liveCenter {display: flex; flex-direction: column; align-items: center;}
-  .photo i,.liveCenter i{font-size: 2.4rem; color: #fff}
-  .photo p,.liveCenter p{font-size: 1.4rem; color: #fff}
-  .nowTitle {font-size: 1.8rem; }
-  .bottom {width: 100%; height: 2.4rem; position: relative;}
-  .swiper-box {width: 92%; margin: 0 auto 0 0}
-  .swiper-item {height: 2.4rem;}
-  .swiper-item p {font: 1.4rem/2.4rem ""; display: flex; justify-content: center; align-items: center; }
-  .bottom .add {height: 2.4rem; width: 8%; position: absolute; right: 0; top: 0; display: flex; justify-content: center; align-items: center;}
-    .add .el-icon-plus {animation: jumpAndRotate 4s linear}
+  @keyframes routerActive {
+    0% {transform: scale(1,1)}
+    100% {transform: scale(1.2,1.2)}
+  }
+  .active {animation: routerActive .4s linear}
+  .el-icon-circle-plus-outline {animation: okinaru 1s linear infinite}
+  .header {
+    position: relative;
+    width: 100%;
+    height: 7rem;
+    .top {
+      width: 100%;
+      height: 4.4rem;
+      background: $backgroundColorBase;
+      .box {
+        width: 86%;
+        height: 4.4rem;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .photo,.liveCenter {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          img {
+            width: 2.0rem;
+            color: #fff;
+          }
+          p {
+            font-size: 1.4rem;
+            color: #fff;
+          }
+        }
+        .nowTitle{
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 1.8rem;
+        }
+      }
+    }
+    .bottom {
+       width: 100%;
+       height: 2.6rem;
+       position: relative;
+       background: #fff;
+       .swiper-box {
+         width: 92%;
+         margin: 0 auto 0 0;
+         .swiper-item {
+           height: 2.6rem;
+           text-align: center;
+           p {
+             font-size: 1.4rem;
+             line-height: 2.6rem;
+           }
+           .active {
+             transition: .5s;
+             color: red;
+             transform: scale(1.2,1.2);
+           }
+         }
+       }
+       .add {
+         height: 2.6rem;
+         width: 8%;
+         position: absolute;
+         right: 0;
+         top: 0;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         .el-icon-plus {
+           width: 1.4rem;
+           animation: jumpAndRotate 1s linear;
+           transition: 1s;
+         }
+       }
+     }
+    .newsChannelsList {
+      z-index: 1000;
+      position: absolute;
+      width: 100%;
+      padding-bottom: 1rem;
+      overflow: hidden;
+      .layout {
+        width: 100%;
+        background: #fff;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        ul {
+          width: 25.6rem;
+          margin: 0 auto;
+          font-size: $fontSize;
+          li {
+            &:nth-child(4n-3) {
+              margin-left: 0;
+            }
+            width: $fontSize * 4;
+            height: $fontSize + 1;
+            border: 1px #eee solid;
+            border-radius: 4px;
+            float: left;
+            margin-left: .8rem;
+            margin-bottom: .6rem;
+            text-align: center;
+            background: #f5f5f5;
+          }
+        }
+      }
+    }
+  }
+
 </style>
