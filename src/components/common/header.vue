@@ -18,7 +18,11 @@
     <div class="bottom">
       <swiper :options="swiperOption" class="swiper-box">
         <swiper-slide v-for="(item,index) in channelsInfoArr" :key="index" class="swiper-item">
-          <p @click="toActive($event)">{{item}}</p>
+          <router-link
+            :to="{name: 'newsList', params: {nowChannel: item}}" tag="p" activeClass="active"
+          >
+            {{item}}
+          </router-link>
         </swiper-slide>
       </swiper>
       <div class="add">
@@ -36,15 +40,15 @@
           </ul>
         </div>
       </transition>
-
     </div>
   </div>
 </template>
 
 <script>
   import axios from "axios"
+  import bus from '../../bus/bus'
 export default {
-  name: 'header',
+  name: 'navBar',
   data () {
     return {
       swiperOption: {
@@ -84,7 +88,6 @@ export default {
         if(data.data.ok !== 1) throw new Error("网络可能有问题。");
         else {
           this.channelsInfoArr = data.data.msg ;
-          this.$store.dispatch('channelList', data.data.msg)
         }
       }).catch((err)=>{
         this.catchError(err.message)
@@ -92,21 +95,13 @@ export default {
     },
     catchError(msg){
       this.$toast(msg)
-    },
-    toActive(e){
-      let arr = document.querySelectorAll(".swiper-box p");
-      for(let i=0;i<arr.length;i++){
-        arr[i].className = ""
-      }
-      e.target.className = "active";
-      this.changeState(e.target.innerHTML)
-    },
-    changeState(v){
-      this.$store.dispatch('commitNowChannel',v)
     }
   },
   mounted(){
 //    this.getChannelsInfoArr();
+    this.$router.push({ name: 'newsList', params: { nowChannel: '头条' }});
+    this.$store.dispatch('commitChannelArr',this.channelsInfoArr)
+
   },
   computed: {
     swiper() {
@@ -139,7 +134,10 @@ export default {
   .active {animation: routerActive .4s linear}
   .el-icon-circle-plus-outline {animation: okinaru 1s linear infinite}
   .header {
-    position: relative;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
     width: 100%;
     height: 7rem;
     .top {

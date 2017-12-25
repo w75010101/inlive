@@ -1,9 +1,9 @@
-import newsContent from '@/components/page/newsContent'
+import newsList from '@/components/page/newsList'
+import newsDetail from '@/components/page/newsDetail'
 
 const routerConfig = [
-  {path:"/",redirect:"/newsContent"},
-  {path:"/newsContent",name:"home",component:newsContent},
-
+  {path:"/newsList/:nowChannel",name:"newsList",component:newsList},
+  {path:"/newsDetail",name:"newsDetail",component:newsDetail},
 ]
 ;
 

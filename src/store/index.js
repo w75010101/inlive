@@ -3,21 +3,21 @@ import Vue from 'vue'
 Vue.use(Vuex);
 const store = new Vuex.Store({
   state:{
-    nowChannel:'头条'
+    channelArr:[]
   },
   actions:{
-    commitNowChannel( obj, v) {
-      obj.commit('changeNowChannel',v);
+    commitChannelArr( obj, v) {
+      obj.commit('changeChannelArr',v);
     }
   },
   mutations:{
-    changeNowChannel( state, v){
-      state.nowChannel = v;
+    changeChannelArr( state, v){
+      state.channelArr = v;
     }
   },
   getters:{
-    changedChannel(state){
-      return state.nowChannel
+    changedChannelArr(state){
+      return state.channelArr
     }
   }
 });
