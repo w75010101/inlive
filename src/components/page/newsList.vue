@@ -127,7 +127,6 @@
             this.loadingBl = false;
             if(data.data.ok !== 1){
               throw new Error('请求有问题，请重试。');
-              return;
             }
             data.data.msg.list.forEach((item) => {
               this.newsArr.push(item);
